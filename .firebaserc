@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "reddit-clone-app-23ebc"
+  },
+  "targets": {
+    "reddit-clone-app-23ebc": {
+      "hosting": {
+        "preview": ["preview"]
+      }
+    }
+  }
+}

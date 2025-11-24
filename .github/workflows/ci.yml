@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install root and workspaces
+        run: |
+          pnpm -v
+          cd reddit-clone
+          pnpm i --ignore-scripts || true
+          pnpm -C frontend i || true
+          cd functions && pnpm i || true
+
+      - name: Lint frontend
+        run: |
+          cd reddit-clone/frontend
+          pnpm lint || true
+
+      - name: Type check frontend
+        run: |
+          cd reddit-clone/frontend
+          pnpm typecheck
+
+      - name: Test frontend
+        run: |
+          cd reddit-clone/frontend
+          pnpm test -- --run
+
+      - name: Test functions
+        run: |
+          cd reddit-clone/functions
+          pnpm test -- --runInBand

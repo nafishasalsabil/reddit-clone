@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    // Public read for all files
+    match /{allPaths=**} {
+      allow read: if true;
+    }
+
+    // Avatars: users can write only their own folder
+    match /avatars/{uid}/{path=**} {
+      allow write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Post images: any signed-in user can upload
+    match /post-images/{pid}/{path=**} {
+      allow write: if isSignedIn();
+    }
+  }
+}
